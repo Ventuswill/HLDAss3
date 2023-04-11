@@ -27,7 +27,7 @@ ABounceProjectile::ABounceProjectile()
     
 
 	//CALL SphereComponent->OnComponentBeginOverlap.AddDynamic() passing in this, &ABounceProjectile::OnOverlapBegin
-    SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ABounceProjectile::OnOverlapBegin);
+    SphereComponent->OnComponentHit.AddDynamic(this, &ABounceProjectile::OnHit);
     
 
 	//SET the SphereComponent as the RootComponent 
@@ -85,6 +85,15 @@ void ABounceProjectile::BeginPlay()
     ProjectileMovementComponent->InitialSpeed = Speed;
 	//CALL ProjectileMovementComponent->MaxSpeed to Speed
     ProjectileMovementComponent->MaxSpeed = Speed;
+
+
+    FVector newLocation;
+
+    newLocation = GetActorLocation();
+
+    newLocation.Y = 0;
+
+    RootComponent->SetWorldLocation(newLocation);
     
 }
 
@@ -92,6 +101,14 @@ void ABounceProjectile::BeginPlay()
 void ABounceProjectile::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    FVector newLocation;
+
+    newLocation = GetActorLocation();
+
+    newLocation.Y = 0;
+
+    RootComponent->SetWorldLocation(newLocation);
 }
 
 void ABounceProjectile::ShootThatProjectile(const FVector& Direction)
@@ -103,72 +120,76 @@ void ABounceProjectile::ShootThatProjectile(const FVector& Direction)
     ProjectileMovementComponent->Velocity = LaunchDir * Speed;
 }
 
-void ABounceProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ABounceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-    /*If it hits against Enemy/Player, else if it hits against world stuff*/
-	//IF OtherActor NOT EQUAL to this->GetOwner()
-    if (OtherActor != this->GetOwner())
+
+    if (OtherActor)
     {
-    	//IF OtherActor->ActorHasTag("Enemy")
-        if (OtherActor->ActorHasTag("Enemy"))
+        /*If it hits against Enemy/Player, else if it hits against world stuff*/
+        //IF OtherActor NOT EQUAL to this->GetOwner()
+        if (OtherActor != this->GetOwner())
         {
-        	//CALL Destroy() on OtherActor
-            OtherActor->Destroy();
-    
-        	//CAll Destroy() on this
-            this->Destroy();
-    
-
-        	//DECLARE a variable called gamestate of type ASuperBlockioGameStateBase and assign it to the return of GetWorld()->GetGameState<ASuperBlockioGameStateBase>()
-            ASuperBlockioGameStateBase* gamestate = GetWorld()->GetGameState<ASuperBlockioGameStateBase>();
-    
-            //IF gamestate NOT nullptr
-            if (gamestate)
+            //IF OtherActor->ActorHasTag("Enemy")
+            if (OtherActor->ActorHasTag("Enemy"))
             {
-            	//CALL IncreaseScore() on gamestate passing in 500
-                gamestate->IncreaseScore(500);
-            }
-        	//ENDIF
-        }
-    	//ELSE IF OtherActor->ActorHasTag("Player")
-        else if (OtherActor->ActorHasTag("Player"))
-        {
-        	//DECLARE a variable called player of type APlayerCharacter* and assign it to the return value of Cast<APlayerCharacter>(OtherActor)
-            APlayerCharacter* player = Cast<APlayerCharacter>(OtherActor);
-    
-        	//CALL HasDied() on player
-            player->HasDied();
-    
-            //CALL Destroy() on this
-            this->Destroy();
-    
-        }
-    	// ELSE IF OtherActor->ActorHasTag("Coin")
-        else if (OtherActor->ActorHasTag("Coin"))
-        {
-        	//IF this->GetOwner()->ActorHasTag("Player")
-            if (this->GetOwner()->ActorHasTag("Player"))
-            {
-            	//DECLARE a variable called gamestate of type ASuperBlockioGameStateBase* and assign it to the return value of GetWorld()->GetGameState<ASuperBlockioGameStateBase>()
-                ASuperBlockioGameStateBase* gamestate = GetWorld()->GetGameState<ASuperBlockioGameStateBase>();
-
-            	//IF  gamestate NOT nullptr
-                if (gamestate)
-                {
-                	//CALL IncreaseCoins() on gamestate passing in 1
-                    gamestate->IncreaseCoins(1);
-                	//CALL IncreaseScore() on gamestate passing in 100
-                    gamestate->IncreaseScore(100);
-                }//ENDIF
-
-            	//CALL Destroy() on OtherActor
+                //CALL Destroy() on OtherActor
                 OtherActor->Destroy();
 
+                //CAll Destroy() on this
+                this->Destroy();
+
+
+                //DECLARE a variable called gamestate of type ASuperBlockioGameStateBase and assign it to the return of GetWorld()->GetGameState<ASuperBlockioGameStateBase>()
+                ASuperBlockioGameStateBase* gamestate = GetWorld()->GetGameState<ASuperBlockioGameStateBase>();
+
+                //IF gamestate NOT nullptr
+                if (gamestate)
+                {
+                    //CALL IncreaseScore() on gamestate passing in 500
+                    gamestate->IncreaseScore(500);
+                }
+                //ENDIF
             }
-        	//ENDIF
-        }//ENDIF
+            //ELSE IF OtherActor->ActorHasTag("Player")
+            else if (OtherActor->ActorHasTag("Player"))
+            {
+                //DECLARE a variable called player of type APlayerCharacter* and assign it to the return value of Cast<APlayerCharacter>(OtherActor)
+                APlayerCharacter* player = Cast<APlayerCharacter>(OtherActor);
+
+                //CALL HasDied() on player
+                player->HasDied();
+
+                //CALL Destroy() on this
+                this->Destroy();
+
+            }
+            // ELSE IF OtherActor->ActorHasTag("Coin")
+            else if (OtherActor->ActorHasTag("Coin"))
+            {
+                //IF this->GetOwner()->ActorHasTag("Player")
+                if (this->GetOwner()->ActorHasTag("Player"))
+                {
+                    //DECLARE a variable called gamestate of type ASuperBlockioGameStateBase* and assign it to the return value of GetWorld()->GetGameState<ASuperBlockioGameStateBase>()
+                    ASuperBlockioGameStateBase* gamestate = GetWorld()->GetGameState<ASuperBlockioGameStateBase>();
+
+                    //IF  gamestate NOT nullptr
+                    if (gamestate)
+                    {
+                        //CALL IncreaseCoins() on gamestate passing in 1
+                        gamestate->IncreaseCoins(1);
+                        //CALL IncreaseScore() on gamestate passing in 100
+                        gamestate->IncreaseScore(100);
+                    }//ENDIF
+
+                    //CALL Destroy() on OtherActor
+                    OtherActor->Destroy();
+
+                }
+                //ENDIF
+            }//ENDIF
+        }
+        //ENDIF
     }
-	//ENDIF
 }
 
 void ABounceProjectile::OnProjectileBounce(const FHitResult& ImpactResult, const FVector& ImpactVelocity)

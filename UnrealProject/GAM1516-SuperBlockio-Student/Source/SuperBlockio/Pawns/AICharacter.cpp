@@ -9,6 +9,10 @@
 #include "Components/BoxComponent.h"
 #include "Perception/PawnSensingComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Components/ArrowComponent.h"
+
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 
 #include "Kismet/GameplayStatics.h"
@@ -22,6 +26,9 @@ AAICharacter::AAICharacter()
     /*Remove the Player is special case, it wont die when interacting with anything The player is responsible for death*/
 	//CALL DestroyComponent() on the BoxComponent
     BoxComponent->DestroyComponent();
+
+    FollowCamera->DestroyComponent();
+    SpringArmComponent->DestroyComponent();
     
 
 	//CREATE the PawnSensingComponent
@@ -157,7 +164,7 @@ void AAICharacter::Shoot()
                 SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
                 //DECLARE a variable called SpawnLocation of type FVector and assign it to the return value of GetCapsuleComponent()->GetComponentLocation()
-                FVector SpawnLocation = GetCapsuleComponent()->GetComponentLocation();
+                FVector SpawnLocation = GetArrowComponent()->GetComponentLocation();
 
                 /*AI Fires balls at the player*/
                 //DECLARE a variable called BounceProjectile of type ABounceProjectile* and assign it to the return value of Cast<ABounceProjectile>(GetWorld()->SpawnActor<ABounceProjectile>(Projectile, SpawnLocation, FRotator(0, 0, 0), SpawnParams))

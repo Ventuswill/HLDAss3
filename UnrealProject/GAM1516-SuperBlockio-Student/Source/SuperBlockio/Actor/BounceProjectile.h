@@ -38,7 +38,7 @@ protected:
 
     //Initial Speed of the Ball
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ball", meta = (AllowPrivateAccess = "true"))
-        float Speed = 8000;
+        float Speed = 1000;
 
 private:
 
@@ -49,7 +49,7 @@ private:
         void OnProjectileBounce(const FHitResult& ImpactResult, const FVector& ImpactVelocity);
 
     UFUNCTION()
-        void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+        void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 public:
 
     void ShootThatProjectile(const FVector& Direction);

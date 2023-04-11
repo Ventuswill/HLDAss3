@@ -22,6 +22,9 @@ UONOFFBlockComponent::UONOFFBlockComponent()
 void UONOFFBlockComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+
+    SwitchStates(Cast<AONOFFBlock>(this->GetOwner()));
 }
 
 
@@ -53,7 +56,7 @@ void UONOFFBlockComponent::SwitchStates(AONOFFBlock* Block)
         State = false;
     }
 	//ELSE
-    
+    else
     {
     	//IF Block->GetType() IS EBlockOnOff::OnOff
         if (Block->GetType() == EBlockOnOff::OnOff)

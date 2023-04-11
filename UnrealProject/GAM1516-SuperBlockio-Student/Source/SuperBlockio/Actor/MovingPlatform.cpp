@@ -14,6 +14,18 @@ AMovingPlatform::AMovingPlatform()
 
 	//SET StartingTarget to ETarget::First
     StartingTarget = ETarget::First;
+
+
+
+    //CREATE the BoxCollision Component
+    BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
+
+    //CALL SetCollisionProfileName() on BoxCollision passing in "BlockAll"
+    BoxCollision->SetCollisionProfileName("BlockAll");
+
+    //SET RootComponent to BoxCollision
+    RootComponent = BoxCollision;
+
     
     //CREATE Target1 Component
     Target1 = CreateDefaultSubobject<UBoxComponent>(TEXT("Target1"));
@@ -38,16 +50,7 @@ AMovingPlatform::AMovingPlatform()
 
 	//CALL SetupAttachment() on Target2 passing in RootComponent
     Target2->SetupAttachment(RootComponent);
-    
 
-	//CREATE the BoxCollision Component
-    BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
-    
-	//CALL SetCollisionProfileName() on BoxCollision passing in "BlockAll"
-    BoxCollision->SetCollisionProfileName("BlockAll");
-    
-	//SET RootComponent to BoxCollision
-    RootComponent = BoxCollision;
 
 	//CREATE the PlatformSprite Component
     PlatformSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("PlatformSprite"));
